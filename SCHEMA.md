@@ -4,18 +4,21 @@
 Why not use PostgreSQL?
 
 
-## Table `taxa`
+## Table `taxon`
 
 | Column              | Type            | Attributes                        |
 | ------------------- | --------------- | --------------------------------- |
 | `id`                | `integer`       | `primary key`, `not null`         |
 | `scientific_name`   | `varchar(1024)` | `unique`, `not null`, "final"     |
 | `rank_id`           | `integer`       | `foreign(rank.id)`, `not null`    |
-| `parent_id`         | `integer`       | `foreign(taxa.id)`                |
+| `parent_id`         | `integer`       | `foreign(taxon.id)`               |
 | `authority`         | `varchar(1024)` |                                   |
 | `organism`          | `enum(...)`     | `not null`                        |
 | `created_at`        | `datetime`      | `not null`                        |
 | `updated_at`        | `datetime`      |                                   |
+
+- `enum('organism_enum', 'animal', 'bacterial', 'fungi', 'plant', 'protist', 'virus')`
+  https://en.wikipedia.org/wiki/Category:Systems_of_taxonomy_by_organism
 
 
 ## Table `rank`
@@ -37,49 +40,40 @@ Why not use PostgreSQL?
 | `published_at`      | `datetime`      | `not null`                        |
 
 
-## Table `taxa_discontinued`
+## Table `taxon_system`
 
 | Column              | Type            | Attributes                        |
 | ------------------- | --------------- | --------------------------------- |
 | `id`                | `integer`       | `primary key`, `not null`         |
-| `taxa_id`           | `integer`       | `foreign(taxa.id)`, `not null`    |
+| `taxon_id`          | `integer`       | `foreign(taxon.id)`, `not null`   |
 | `system_id`         | `integer`       | `foreign(system.id)`              |
-| `another_taxa_id`   | `integer`       | `foreign(taxa.id)`                |
-| `another_taxa_type` | `enum(...)`     |                                   |
-| `is_valid`          | `boolean`       | `not null`                        |
+| `another_taxon_id`  | `integer`       | `foreign(taxon.id)`               |
+| `another_taxon_type`| `enum(...)`     |                                   |
+| `is_recognized`     | `boolean`       | `not null`                        |
 
-- `enum('taxa_discontinued_another_taxa_type', 'parent', 'sibling')`
-
-
-## Table `taxa_system`
-
-| Column              | Type            | Attributes                        |
-| ------------------- | --------------- | --------------------------------- |
-| `id`                | `integer`       | `primary key`, `not null`         |
-| `taxa_id`           | `integer`       | `foreign(taxa.id)`, `not null`    |
-| `system_id`         | `integer`       | `foreign(system.id)`, `not null`  |
+- `enum('another_taxon_type_enum', 'parent', 'sibling')`
 
 
-## Table `taxa_alias_name`
+## Table `taxon_alias`
 
 | Column              | Type            | Attributes                        |
 | ------------------- | --------------- | --------------------------------- |
 | `id`                | `integer`       | `primary key`, `not null`         |
-| `taxa_id`           | `integer`       | `foreign(taxa.id)`, `not null`    |
+| `taxon_id`          | `integer`       | `foreign(taxon.id)`, `not null`   |
 | `language`          | `enum(...)`     | `not null`                        |
 | `is_primary`        | `boolean`       | `not null`                        |
 | `name`              | `varchar(1024)` | `not null`                        |
 
-- `unique(taxa_id, is_primary)`
-- `enum('taxa_alias_name_language', 'en', 'zh-cn', 'zh-tw', 'zh-hk')`
+- `unique(taxon_id, is_primary)`
+- `enum('taxon_alias_language_enum', 'en', 'zh-cn', 'zh-tw', 'zh-hk')`
 
 
-## Table `taxa_revision`
+## Table `taxon_revision`
 
 | Column              | Type            | Attributes                        |
 | ------------------- | --------------- | --------------------------------- |
-| `id`                | `integer`       | `primary key`, `not null`         |
-| `taxa_id`           | `integer`       | `foreign(taxa.id)`, `not null`    |
+| `id`                | `big_integer`   | `primary key`, `not null`         |
+| `taxon_id`          | `integer`       | `foreign(taxon.id)`, `not null`   |
 | `contributor_id`    | `integer`       | `not null`                        |
 | `body`              | `JSON`          |                                   |
 | `comment`           | `varchar(1024)  |                                   |
@@ -87,7 +81,9 @@ Why not use PostgreSQL?
 
 ## TODO
 
+- contributor
+- extend authority
 - extinct?
 - references
-- taxa description
-- taxa revision tag (for review)
+- taxon description
+- taxon revision tag (for review)
