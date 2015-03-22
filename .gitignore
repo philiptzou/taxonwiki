@@ -52,3 +52,17 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Bower components
+taxonwiki/static/components/
+
+# webassets files
+.webassets-manifest
+
+# Compass/sass cache
+.sass-cache
+
+# Vim
+*.swp
+*.swo
+*.swa

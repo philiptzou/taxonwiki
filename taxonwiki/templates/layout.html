@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app>
+  <head>
+    {% assets "main_css" %}
+      <link rel="stylesheet" href="{{ ASSET_URL }}">
+    {% endassets %}
+  </head>
+  <body>
+    {% block body %}
+    {% endblock %}
+    {% assets "main_js" %}
+      <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+  </body>
+</html>

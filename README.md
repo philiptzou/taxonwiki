@@ -6,9 +6,9 @@ A taxonomy website for Chinese
 - [x] Database schema
 - [x] Basic application
 - [x] Basic models
-- [ ] Basic views
-- [ ] Basic assets files
-- [ ] Basic templates
+- [x] Basic views
+- [x] Basic assets files
+- [x] Basic templates
 - [ ] Add missing schema (described in SCHEMA.md)
 - [ ] Views for editing taxonomy data by authorized users
 - [ ] Revision functions and views
