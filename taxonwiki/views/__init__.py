@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import home
+from . import home, taxon
 
-__all__ = ['home']
+__all__ = ['home', 'taxon']

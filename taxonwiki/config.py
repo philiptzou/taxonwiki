@@ -13,10 +13,11 @@ class Config(object):
     COMPASS_CONFIG = {
         'output_style': ':compressed'
     }
+    SECRET_KEY = 'I am not safe please do not use me'
 
 
 class ProductionConfig(Config):
-    pass
+    SECRET_KEY = None
 
 
 class DevelopmentConfig(Config):

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{%- block content %}
+<section class="col-xs-12 col-sm-10 col-md-8">
+  <form method="post" class="form form-horizontal" role="form">
+  {%- with form = taxon.form,
+           kw = {"form_type": "horizontal",
+                 "horizontal_columns": ("lg", 3, 9),
+                 "button_map": {"submit": "primary"}}
+  %}
+  {{ form.hidden_tag() }}
+  {{ wtf.form_field(form.scientific_name, readonly=not is_creating, **kw) }}
+  {{ wtf.form_field(form.rank, **kw) }}
+  {{ wtf.form_field(form.authority, **kw) }}
+  {{ wtf.form_field(form.organism, **kw) }}
+  {{ wtf.form_field(form.submit, **kw) }}
+  {%- endwith %}
+  </form>
+</section>
+{%- endblock %}

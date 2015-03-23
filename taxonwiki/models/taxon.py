@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
-from flask import current_app as app
-from ._common import ENUM_ORGANISM
+import arrow
+
+from wtforms import fields
+from flask import current_app as app, abort, url_for
+from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy_utils import ChoiceType, ArrowType
+
+from ._types import ORGANISM_TYPE, RANK_TYPE
+from ..lib import orm_helpers
 
 db = app.db
 
@@ -12,48 +18,94 @@ class Taxon(db.Model):
     id = db.Column(db.Integer(), primary_key=True, nullable=False)
 
     scientific_name = db.Column(db.Unicode(1024),
-                                unique=True, nullable=False)
+                                unique=True, nullable=False,
+                                info={'label': 'Scientific name'})
 
-    rank_id = db.Column(db.Integer(), db.ForeignKey('rank.id'),
-                        nullable=False, index=True)
+    rank = db.Column(ChoiceType(RANK_TYPE),
+                     nullable=False, index=True,
+                     info={'label': 'Rank'})
 
     parent_id = db.Column(db.Integer(), db.ForeignKey('taxon.id'), index=True)
 
-    authority = db.Column(db.Unicode(1024))
+    authority = db.Column(db.Unicode(1024),
+                          info={'label': 'Authority'})
 
-    organism = db.Column(ENUM_ORGANISM, nullable=False)
+    organism = db.Column(ChoiceType(ORGANISM_TYPE), nullable=False,
+                         info={'label': 'Organism'})
 
-    created_at = db.Column(db.DateTime(timezone=True),
+    created_at = db.Column(ArrowType(),
                            nullable=False, index=True)
 
-    updated_at = db.Column(db.DateTime(timezone=True))
+    updated_at = db.Column(ArrowType())
 
-    def __init__(self, scientific_name, rank_id,
-                 parent_id, authority, organism):
-        self.scientific_name = scientific_name
-        self.__update(rank_id, parent_id, authority, organism)
-        self.created_at = datetime.now()
+    def __init__(self, scientific_name=None, **args):
+        self._form = None
+        super(Taxon, self).__init__(
+            scientific_name=scientific_name, **args)
+
+    def url(self, method='show', **args):
+        if method in ('index', 'new'):
+            url = url_for('TaxonView:{0}'.format(method), **args)
+        else:
+            url = url_for('TaxonView:{0}'.format(method),
+                          scientific_name=self.scientific_name,
+                          **args)
+        return url
+
+    @property
+    def form(self):
+        return self._form
 
     @classmethod
-    def create(cls, scientific_name, rank_id,
-               parent_id, authority, organism):
-        self = cls(scientific_name, rank_id, parent_id, authority, organism)
-        db.session.add(self)
-
-    def __update(self, rank_id, parent_id, authority, organism):
-        self.rank_id = rank_id
-        self.parent_id = parent_id
-        self.authority = authority
-        self.organism = organism
-
-    def update(self, rank_id, parent_id, authority, organism):
-        self.__update(rank_id, parent_id, authority, organism)
-        self.updated_at = datetime.now()
-
-    def scientific_name_exists(self, scientific_name):
-        exists = Taxon.query.filter_by(scientific_name=scientific_name).count()
+    def is_exists(cls, scientific_name):
+        exists = cls.query.filter_by(scientific_name=scientific_name).count()
         return bool(exists)
 
+    @classmethod
+    def create(cls, unsafe_form):
+        self = cls()
+        success = False
+        if cls.is_exists(unsafe_form.get('scientific_name')):
+            abort(409)
+        self._form = safe_form = TaxonForm(unsafe_form)
+        if safe_form.validate_on_submit():
+            safe_form.populate_obj(self)
+            self.created_at = arrow.now()
+            db.session.add(self)
+            success = True
+        return self, success
+
+    @classmethod
+    def retrieve(cls, scientific_name):
+        try:
+            self = cls.query.filter_by(scientific_name=scientific_name).one()
+        except NoResultFound:
+            abort(404, 'The requested taxon was not found.')
+        return self
+
+    def update(self, unsafe_form):
+        self._form = safe_form = TaxonForm(unsafe_form, obj=self)
+        success = False
+        if safe_form.validate_on_submit():
+            safe_form.populate_obj(self)
+            # forbid to edit scientific name though update
+            if orm_helpers.is_changed(self, 'scientific_name'):
+                abort(403, 'Scientific name can not be changeed.')
+            if orm_helpers.is_changed(self):
+                self.updated_at = arrow.now()
+            success = True
+        return self, success
+
     def update_scientific_name(self, name):
-        if not self.scientific_name_exists(name):
+        if not self.is_exists(name):
             self.scientific_name = name
+
+
+class TaxonForm(app.ModelForm):
+
+    class Meta:
+        model = Taxon
+        exclude = ['created_at', 'updated_at']
+        strip_string_fields = True
+
+TaxonForm.submit = fields.SubmitField('Submit')

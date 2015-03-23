@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from flask import current_app as app
-from ._common import ENUM_ORGANISM
+from sqlalchemy_utils import ArrowType, ChoiceType
+
+from ._types import ORGANISM_TYPE
 
 db = app.db
 
@@ -12,6 +14,6 @@ class System(db.Model):
 
     name = db.Column(db.Unicode(1024), nullable=False)
 
-    organism = db.Column(ENUM_ORGANISM, nullable=False)
+    organism = db.Column(ChoiceType(ORGANISM_TYPE), nullable=False)
 
-    published_at = db.Column(db.DateTime(timezone=True), nullable=False)
+    published_at = db.Column(ArrowType(), nullable=False)

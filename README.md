@@ -3,14 +3,17 @@ A taxonomy website for Chinese
 
 # TODO list
 
-- [x] Database schema
-- [x] Basic application
-- [x] Basic models
-- [x] Basic views
-- [x] Basic assets files
-- [x] Basic templates
+- [x] Use SQLAlchemyUtils and Arrow
 - [ ] Add missing schema (described in SCHEMA.md)
-- [ ] Views for editing taxonomy data by authorized users
+- [ ] Views for showing and editing taxonomy data (TaxonView)
+ - [x] Basic views and model methods for showing
+ - [x] Basic views and model methods for editing and creating
+ - [ ] Basic templates for showing
+ - [x] Basic templates for editing and creating
+ - [ ] Only can be edited by authorized users
+- [ ] Views for indexing taxa (TaxaView)
+- [ ] Homepage View (HomeView)
+- [ ] Fake data generator (for development and testing)
 - [ ] Revision functions and views
 - [ ] OAuth support (use Chinese Wikipedia as OAuth server)
 - [ ] Account support (or just OAuth?)

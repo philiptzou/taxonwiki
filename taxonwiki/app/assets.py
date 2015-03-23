@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
+from flask.ext.bootstrap import Bootstrap
 from flask.ext.assets import Environment, Bundle
 
 
 def init_app(app):
+    Bootstrap(app)
     assets = Environment(app)
     app.assets = assets
 
     # main.js
-    main_js = Bundle('components/jquery/dist/jquery.js',
-                     'components/angular/angular.js',
-                     'components/ui.bootstrap/index.js',
+    main_js = Bundle('javascripts/main.js',
                      filters='uglifyjs', output='gen/main.js')
 
     # main.css

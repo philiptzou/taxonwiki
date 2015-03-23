@@ -1,7 +1,5 @@
 /*
  * This is the main stylesheets file which contains all files'll be compiled into main.css
  */
-$bootstrap-sass-path: "../components/bootstrap-sass/assets/";
-$icon-font-path: "#{$bootstrap-sass-path}/fonts/";
-
-@import "../components/bootstrap-sass/assets/stylesheets/bootstrap";
+//@import "../components/bootstrap-sass/assets/stylesheets/bootstrap";
+@import "reset";
