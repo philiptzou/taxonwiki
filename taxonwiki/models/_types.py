@@ -2,6 +2,8 @@
 from __future__ import unicode_literals
 
 ORGANISM_TYPE = [
+    (None, 'Select one...'),
+    ('invalid', '(Invalid)'),
     ('animal', 'Animal'),
     ('bacterial', 'Bacterial'),
     ('fungi', 'Fungi'),
@@ -10,9 +12,15 @@ ORGANISM_TYPE = [
     ('virus', 'Virus')
 ]
 
+TAXON_STATUS_TYPE = [
+    ('valid', 'Valid'),
+    ('invalid', 'Invalid')
+]
+
 # TODO: use [All ranks](https://en.wikipedia.org/wiki/Taxonomic_rank#All_ranks)
 # instead of main ranks.
 RANK_TYPE = [
+    (None, 'Select one...'),
     ('domain', 'Domain'),
     ('kingdom', 'Kingdom'),
     ('phylum', 'Phylum'),

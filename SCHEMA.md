@@ -9,25 +9,35 @@ Why not use PostgreSQL?
 | Column              | Type            | Attributes                        |
 | ------------------- | --------------- | --------------------------------- |
 | `id`                | `integer`       | `primary key`, `not null`         |
-| `scientific_name`   | `varchar(1024)` | `unique`, `not null`, "final"     |
-| `rank_id`           | `integer`       | `foreign(rank.id)`, `not null`    |
+| `scientific_name`   | `varchar(1024)` | `unique`, `not null`              |
+| `rank`              | `choice(...)`   | `not null`                        |
 | `parent_id`         | `integer`       | `foreign(taxon.id)`               |
-| `authority`         | `varchar(1024)` |                                   |
-| `organism`          | `enum(...)`     | `not null`                        |
+| `author_abbr`       | `varchar(1024)` |                                   |
+| `organism`          | `choice(...)`   | `not null`                        |
 | `created_at`        | `datetime`      | `not null`                        |
 | `updated_at`        | `datetime`      |                                   |
 
-- `enum('organism_enum', 'animal', 'bacterial', 'fungi', 'plant', 'protist', 'virus')`
+- `organism` = `choice('animal', 'bacterial', 'fungi', 'plant', 'protist', 'virus')`
   https://en.wikipedia.org/wiki/Category:Systems_of_taxonomy_by_organism
 
 
-## Table `rank`
+## Table `author`
 
 | Column              | Type            | Attributes                        |
 | ------------------- | --------------- | --------------------------------- |
 | `id`                | `integer`       | `primary key`, `not null`         |
 | `name`              | `varchar(1024)` | `not null`                        |
-| `organism`          | `enum(...)`     |                                   |
+| `name_vector`       | `TSVector(name)`|                                   |
+
+
+## Table `taxon_author`
+
+| Column              | Type            | Attributes                        |
+| ------------------- | --------------- | --------------------------------- |
+| `id`                | `big_integer`   | `primary key`, `not null`         |
+| `taxon_id`          | `integer`       | `foreign(taxon.id)`, `not null`   |
+| `author_id`         | `integer`       | `foreign(author.id)`, `not null`  |
+| `year`              | `integer`       |                                   |
 
 
 ## Table `system`
@@ -36,7 +46,7 @@ Why not use PostgreSQL?
 | ------------------- | --------------- | --------------------------------- |
 | `id`                | `integer`       | `primary key`, `not null`         |
 | `name`              | `varchar(1024)` | `not null`                        |
-| `organism`          | `enum(...)`     | `not null`                        |
+| `organism`          | `choice(...)`   | `not null`                        |
 | `published_at`      | `datetime`      | `not null`                        |
 
 
@@ -46,7 +56,7 @@ Why not use PostgreSQL?
 | ------------------- | --------------- | --------------------------------- |
 | `id`                | `integer`       | `primary key`, `not null`         |
 | `taxon_id`          | `integer`       | `foreign(taxon.id)`, `not null`   |
-| `system_id`         | `integer`       | `foreign(system.id)`              |
+| `system_id`         | `integer`       | `foreign(system.id)`, `not null`  |
 | `another_taxon_id`  | `integer`       | `foreign(taxon.id)`               |
 | `another_taxon_type`| `enum(...)`     |                                   |
 | `is_recognized`     | `boolean`       | `not null`                        |
@@ -60,12 +70,12 @@ Why not use PostgreSQL?
 | ------------------- | --------------- | --------------------------------- |
 | `id`                | `integer`       | `primary key`, `not null`         |
 | `taxon_id`          | `integer`       | `foreign(taxon.id)`, `not null`   |
-| `language`          | `enum(...)`     | `not null`                        |
+| `language`          | `choice(...)`   | `not null`                        |
 | `is_primary`        | `boolean`       | `not null`                        |
 | `name`              | `varchar(1024)` | `not null`                        |
 
 - `unique(taxon_id, is_primary)`
-- `enum('taxon_alias_language_enum', 'en', 'zh-cn', 'zh-tw', 'zh-hk')`
+- `language` = `choice('en', 'zh-cn', 'zh-tw', 'zh-hk')`
 
 
 ## Table `taxon_revision`
@@ -82,7 +92,6 @@ Why not use PostgreSQL?
 ## TODO
 
 - contributor
-- extend authority
 - extinct?
 - references
 - taxon description

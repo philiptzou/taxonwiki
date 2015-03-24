@@ -11,7 +11,7 @@
   {{ form.hidden_tag() }}
   {{ wtf.form_field(form.scientific_name, readonly=not is_creating, **kw) }}
   {{ wtf.form_field(form.rank, **kw) }}
-  {{ wtf.form_field(form.authority, **kw) }}
+  {{ wtf.form_field(form.author_abbr, **kw) }}
   {{ wtf.form_field(form.organism, **kw) }}
   {{ wtf.form_field(form.submit, **kw) }}
   {%- endwith %}
